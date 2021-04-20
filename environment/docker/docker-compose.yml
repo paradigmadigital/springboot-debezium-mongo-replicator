@@ -1,0 +1,66 @@
+version: '2.1'
+services:
+  zookeeper:
+    image: debezium/zookeeper:1.5
+    container_name: zookeeper
+    ports:
+      - 2181:2181
+      - 2888:2888
+      - 3888:3888
+  kafka:
+    image: debezium/kafka:1.5
+    container_name: kafka
+    ports:
+      - 9092:9092
+    environment:
+      - ZOOKEEPER_CONNECT=zookeeper:2181
+    links:
+      - zookeeper
+  mysql:
+    image: debezium/example-mysql:1.5
+    container_name: mysql
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=debezium
+      - MYSQL_USER=mysqluser
+      - MYSQL_PASSWORD=mysqlpw
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    ports:
+      - 27017:27017
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin1
+  connect:
+    image: debezium/connect:1.5
+    container_name: connect
+    ports:
+      - 8083:8083
+    environment:
+      - BOOTSTRAP_SERVERS=kafka:9092
+      - GROUP_ID=1
+      - CONFIG_STORAGE_TOPIC=my_connect_configs
+      - OFFSET_STORAGE_TOPIC=my_connect_offsets
+      - STATUS_STORAGE_TOPIC=my_connect_statuses
+    links:
+      - zookeeper
+      - kafka
+      - mysql
+  replicator:
+    image: es.paradigma.cdc/replicator-mongodb:0.0.1-SNAPSHOT
+    container_name: replicator
+    environment:
+      - SPRING_DATA_MONGODB_USERNAME=admin
+      - SPRING_DATA_MONGODB_PASSWORD=admin1
+      - SPRING_DATA_MONGODB_HOST=mongo
+      - SPRING_DATA_MONGODB_PORT=27017
+      - SPRING_DATA_MONGODB_DATABASE=inventory
+      - SPRING_DATA_MONGODB_AUTHENTICATION-DATABASE=admin
+      - KAFKA_HOST=kafka:9092
+      - KAFKA_GROUP=replicator-dev
+      - KAFKA_TOPIC_PRODUCT=dbserver1.inventory.products
+    links:
+      - kafka
+      - mongo
