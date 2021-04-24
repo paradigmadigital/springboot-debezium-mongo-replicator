@@ -20,16 +20,19 @@ The following project reads the MySQL Debezium events from Apache Kafka and proc
   docker build -t es.paradigma.cdc/replicator-mongodb:0.0.1-SNAPSHOT <Dockerfile-path>
 ```
 
-2. Build environment (MySQL + Apache Zookeeper + Apache Kafka + Apache Kafka Connect + MongoDB and Debezium MySQL connector) [Script](environment/init_environment.sh)
+2. Build environment (MySQL + Apache Zookeeper + Apache Kafka + Apache Kafka Connect + Kafdrop + MongoDB + Debezium MySQL connector) [Script](environment/init_environment.sh)
 ```
   sh init_environment.sh
 ```
 
-> **NOTE:** To stop environment [Script](environment/stop_environment.sh)
+> To stop environment [Script](environment/stop_environment.sh)
 >
 > ```
 >    sh stop_environment.sh
 > ```
+
+
+> To verify the events generated in Apache Kafka, you can use the [Kafdrop](https://github.com/obsidiandynamics/kafdrop) tool: http://localhost:9000
 
 ---
 ### Reference Documentation
